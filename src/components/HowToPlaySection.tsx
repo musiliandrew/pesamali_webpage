@@ -48,7 +48,7 @@ const steps = [
     step: "06",
     title: "Win the Game",
     description:
-      "The player with the most Pesa Points at the end wins! Balance saving, spending, and investing to come out on top.",
+      "The first player to play all their savings cards, spending cards, buy their assets, and purchase the dream wins the match! Strategize wisely to finish first.",
   },
 ];
 

@@ -109,8 +109,8 @@ export default function TermsPage() {
             <p>
               PesaMali matches are governed by the in-game rules. Each match involves rolling
               dice, drawing cards (playing cards, savings cards, spending cards), buying assets,
-              and managing your Pesa Points balance. The player with the most Pesa Points at the
-              end of a match wins.
+              and managing your Pesa Points balance. The first player to play all their savings cards,
+              spending cards, buy their assets, and purchase the dream wins the match.
             </p>
 
             <h3 className="text-base font-semibold text-brand-gold/80 mt-4 mb-2">4.2 Fair Play Policy</h3>
@@ -323,8 +323,8 @@ export default function TermsPage() {
               <p>Nairobi, Kenya</p>
               <p>
                 Email:{" "}
-                <a href="mailto:hello@pesamali.com" className="text-brand-gold hover:underline">
-                  hello@pesamali.com
+                <a href="mailto:hello@moski.money" className="text-brand-gold hover:underline">
+                  hello@moski.money
                 </a>
               </p>
             </div>

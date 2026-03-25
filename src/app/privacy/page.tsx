@@ -187,8 +187,8 @@ export default function PrivacyPage() {
             </ul>
             <p className="mt-3">
               To exercise any of these rights, contact us at{" "}
-              <a href="mailto:hello@pesamali.com" className="text-brand-gold hover:underline">
-                hello@pesamali.com
+              <a href="mailto:hello@moski.money" className="text-brand-gold hover:underline">
+                hello@moski.money
               </a>.
             </p>
           </section>
@@ -261,8 +261,8 @@ export default function PrivacyPage() {
               <p>Nairobi, Kenya</p>
               <p>
                 Email:{" "}
-                <a href="mailto:hello@pesamali.com" className="text-brand-gold hover:underline">
-                  hello@pesamali.com
+                <a href="mailto:hello@moski.money" className="text-brand-gold hover:underline">
+                  hello@moski.money
                 </a>
               </p>
             </div>
