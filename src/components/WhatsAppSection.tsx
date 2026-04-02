@@ -28,38 +28,44 @@ export default function WhatsAppSection() {
             id="community"
             className="relative py-20 sm:py-28 overflow-hidden"
         >
+            {/* Background image to match other sections */}
+            <div
+                className="absolute inset-0 bg-cover bg-center opacity-60"
+                style={{ backgroundImage: "url('/solid_color_branding.png')" }}
+            />
+            <div className="absolute inset-0 bg-brand-dark/50" />
+
             {/* Animated green glow blobs */}
             <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-brand-olive/20 blur-3xl pointer-events-none" />
             <div className="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-[#25D366]/10 blur-3xl pointer-events-none" />
 
-            <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                {/* Label */}
-                <span className="inline-flex items-center gap-2 text-[#25D366] text-sm font-semibold uppercase tracking-widest mb-4">
-                    <MessageCircle size={16} className="animate-pulse" />
-                    Community
-                </span>
-
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-brand-cream mt-2 mb-5 leading-tight">
-                    Join Our{" "}
-                    <span className="text-[#25D366]">WhatsApp Community</span>
-                </h2>
-
-                <p className="text-brand-cream/60 max-w-xl mx-auto text-base sm:text-lg leading-relaxed mb-12">
-                    Be part of the PesaMali inner circle. Get exclusive launch updates,
-                    early access, and connect with fellow players before the official release.
-                </p>
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                {/* Section header matched to others */}
+                <div className="mb-16">
+                    <span className="text-brand-gold text-sm font-semibold uppercase tracking-widest flex items-center justify-center gap-2">
+                        <MessageCircle size={16} className="text-[#25D366] animate-pulse" />
+                        Community
+                    </span>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-brand-cream mt-3 mb-5 leading-tight">
+                        Join Our <span className="text-[#25D366]">WhatsApp Community</span>
+                    </h2>
+                    <p className="text-brand-cream/60 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+                        Be part of the PesaMali inner circle. Get exclusive launch updates,
+                        early access, and connect with fellow players before the official release.
+                    </p>
+                </div>
 
                 {/* Perks grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-12 text-left">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 text-left">
                     {perks.map((perk) => (
                         <div
                             key={perk.title}
-                            className="group bg-white/4 hover:bg-[#25D366]/8 border border-brand-olive/20 hover:border-[#25D366]/40 rounded-2xl p-6 transition-all duration-300"
+                            className="bg-brand-green/30 backdrop-blur-sm border border-brand-olive/30 rounded-2xl p-6 hover:border-[#25D366]/40 transition-all group"
                         >
-                            <div className="w-10 h-10 rounded-xl bg-[#25D366]/15 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                <perk.icon size={20} className="text-[#25D366]" />
+                            <div className="w-11 h-11 rounded-xl bg-[#25D366]/10 flex items-center justify-center mb-4 group-hover:bg-[#25D366]/20 transition-colors">
+                                <perk.icon size={22} className="text-[#25D366]" />
                             </div>
-                            <h3 className="text-brand-cream font-bold text-base mb-1.5">
+                            <h3 className="text-brand-cream font-bold text-lg mb-2">
                                 {perk.title}
                             </h3>
                             <p className="text-brand-cream/50 text-sm leading-relaxed">
