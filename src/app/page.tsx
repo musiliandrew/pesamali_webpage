@@ -3,6 +3,7 @@ import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import HowToPlaySection from "@/components/HowToPlaySection";
 import TournamentsSection from "@/components/TournamentsSection";
+import WhatsAppSection from "@/components/WhatsAppSection";
 import DownloadSection from "@/components/DownloadSection";
 import Footer from "@/components/Footer";
 
@@ -15,6 +16,7 @@ export default function Home() {
         <AboutSection />
         <HowToPlaySection />
         <TournamentsSection />
+        <WhatsAppSection />
         <DownloadSection />
       </main>
       <Footer />
