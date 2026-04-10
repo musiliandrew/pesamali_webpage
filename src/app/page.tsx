@@ -6,6 +6,7 @@ import TournamentsSection from "@/components/TournamentsSection";
 import WhatsAppSection from "@/components/WhatsAppSection";
 import DownloadSection from "@/components/DownloadSection";
 import Footer from "@/components/Footer";
+import FloatingWhatsAppButton from "@/components/FloatingWhatsAppButton";
 
 export default function Home() {
   return (
@@ -19,6 +20,7 @@ export default function Home() {
         <WhatsAppSection />
         <DownloadSection />
       </main>
+      <FloatingWhatsAppButton />
       <Footer />
     </>
   );

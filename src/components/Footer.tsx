@@ -3,10 +3,11 @@ import Image from "next/image";
 import { Heart } from "lucide-react";
 
 const footerLinks = [
-  { label: "About", href: "#about" },
-  { label: "How to Play", href: "#how-to-play" },
-  { label: "Tournaments", href: "#tournaments" },
-  { label: "Download", href: "#download" },
+  { label: "About", href: "/#about" },
+  { label: "How to Play", href: "/#how-to-play" },
+  { label: "Shop", href: "/shop" },
+  { label: "Tournaments", href: "/#tournaments" },
+  { label: "Download", href: "/#download" },
 ];
 
 export default function Footer() {

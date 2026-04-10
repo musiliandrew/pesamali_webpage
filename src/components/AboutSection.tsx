@@ -1,4 +1,5 @@
 import { Target, Users, TrendingUp, Shield } from "lucide-react";
+import Link from "next/link";
 
 const features = [
   {
@@ -72,6 +73,22 @@ export default function AboutSection() {
               </p>
             </div>
           ))}
+        </div>
+
+        {/* Physical Board Game CTA */}
+        <div className="mt-16 bg-brand-gold/5 border border-brand-gold/20 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-8 group">
+          <div className="flex-1">
+            <h3 className="text-2xl font-bold text-brand-gold mb-2 group-hover:text-brand-gold-light transition-colors">Prefer the Classics?</h3>
+            <p className="text-brand-cream/70 text-base">Get the high-quality physical board game for your school, club, or family. Same fun, same lessons, no screen required.</p>
+          </div>
+          <div className="shrink-0">
+            <Link
+              href="/shop"
+              className="inline-flex items-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-dark font-black px-8 py-4 rounded-full transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(212,168,67,0.2)]"
+            >
+              Order Physical Board Game
+            </Link>
+          </div>
         </div>
       </div>
     </section>
