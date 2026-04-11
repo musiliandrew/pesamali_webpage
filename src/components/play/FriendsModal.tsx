@@ -2,24 +2,23 @@
 
 import { useEffect, useState, useMemo } from "react";
 import OverlayModal from "./OverlayModal";
-import { UserPlus, Search, UserCheck, Clock, X, MessageCircle, Gift, Swords } from "lucide-react";
+import { UserPlus, Search, UserCheck, Clock, X, MessageCircle, Gift, Swords, Zap } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/env";
 import { getToken } from "@/lib/auth";
 
 type Friend = {
     id: string;
     displayName: string;
-    avatar?: string;
-    pesaPoints?: number;
+    avatar?: string | null;
+    pesaProfile?: number;
     streak?: number;
-    isOnline?: boolean;
+    online?: boolean;
 };
 
 type FriendRequest = {
     id: string;
-    fromUserId: string;
     fromDisplayName: string;
-    status: string;
+    fromUserId: string;
 };
 
 export default function FriendsModal({
@@ -135,18 +134,22 @@ export default function FriendsModal({
                                         <div className="w-12 h-12 rounded-full bg-brand-green/10 border-2 border-white shadow-sm flex items-center justify-center text-brand-green font-black">
                                             {(f.displayName || "?").charAt(0).toUpperCase()}
                                         </div>
-                                        <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${f.isOnline ? 'bg-green-500' : 'bg-gray-300'}`} />
+                                        <div className={`w-2.5 h-2.5 rounded-full border-2 border-white absolute bottom-0.5 right-0.5 ${f.online ? 'bg-green-500' : 'bg-gray-400'}`} />
                                     </div>
                                     <div className="flex-1">
-                                        <div className="text-sm font-black text-brand-dark uppercase tracking-tight">{f.displayName}</div>
-                                        <div className="text-[10px] font-bold text-brand-dark/40">Pts: {f.pesaPoints || 0} • 🔥 {f.streak || 0}</div>
+                                        <h4 className="text-[13px] font-black text-brand-dark uppercase tracking-tight">{f.displayName}</h4>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                            <span className="text-[9px] font-bold text-brand-dark/40 uppercase">{f.pesaProfile?.toLocaleString() || 0} Pesa</span>
+                                            <div className="w-1 h-1 rounded-full bg-black/10" />
+                                            <span className="text-[9px] font-bold text-brand-dark/40 uppercase">Streak {f.streak || 0}</span>
+                                        </div>
                                     </div>
                                     <div className="flex gap-2">
-                                        <button className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-100 transition shadow-sm">
-                                            <Gift size={16} />
+                                        <button className="w-8 h-8 rounded-lg bg-black/5 flex items-center justify-center text-brand-dark/40 hover:bg-brand-gold/10 hover:text-brand-gold transition">
+                                            <Gift size={14} />
                                         </button>
-                                        <button className="w-9 h-9 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center hover:bg-orange-100 transition shadow-sm">
-                                            <Swords size={16} />
+                                        <button className="w-8 h-8 rounded-lg bg-black/5 flex items-center justify-center text-brand-dark/40 hover:bg-brand-green/10 hover:text-brand-green transition">
+                                            <Zap size={14} />
                                         </button>
                                     </div>
                                 </div>
@@ -164,9 +167,14 @@ export default function FriendsModal({
                         ) : (
                             incoming.map((r) => (
                                 <div key={r.id} className="bg-white border border-black/[0.04] rounded-2xl p-4 flex items-center justify-between">
-                                    <div>
-                                        <div className="text-sm font-black text-brand-dark uppercase tracking-tight">{r.fromDisplayName}</div>
-                                        <div className="text-[10px] font-bold text-brand-dark/40">wants to be your friend</div>
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green">
+                                            <UserPlus size={18} />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-[12px] font-black text-brand-dark uppercase tracking-tight">{r.fromDisplayName}</h4>
+                                            <p className="text-[9px] font-bold text-brand-dark/40 uppercase">Wants to be your friend</p>
+                                        </div>
                                     </div>
                                     <div className="flex gap-2">
                                         <button
