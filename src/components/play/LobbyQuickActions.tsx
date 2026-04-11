@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, Users, Trophy, Hash, BookOpen } from "lucide-react";
+import { Play, Users, Trophy, Hash, BookOpen, type LucideIcon } from "lucide-react";
 
 function GridTile({
   icon: Icon,
@@ -10,7 +10,7 @@ function GridTile({
   onPress,
   badgeCount = 0,
 }: {
-  icon: typeof Play;
+  icon: LucideIcon;
   color: string;
   label: string;
   sub?: string;
@@ -20,7 +20,7 @@ function GridTile({
   return (
     <button
       onClick={onPress}
-      className="flex-1 rounded-[20px] min-h-[92px] bg-[rgba(255,253,240,0.97)] border-[1.5px] border-[rgba(212,175,55,0.30)] shadow-sm"
+      className="flex-1 rounded-[20px] min-h-[92px] bg-[rgba(255,253,240,0.97)] border-[1.5px] border-[rgba(212,175,55,0.30)] shadow-sm hover:scale-[1.02] active:scale-95 transition-all"
     >
       <div className="relative h-full flex flex-col items-center justify-center px-3 py-3">
         <div
@@ -29,16 +29,16 @@ function GridTile({
         >
           <Icon size={22} color={color} strokeWidth={2} />
         </div>
-        <div className="text-[12px] font-extrabold text-[rgb(26,26,26)] text-center truncate w-full">
+        <div className="text-[11px] font-black text-[rgb(26,26,26)] text-center truncate w-full uppercase tracking-tighter">
           {label}
         </div>
         {sub ? (
-          <div className="text-[9.5px] font-semibold text-[rgba(139,115,85,1)] mt-0.5 text-center truncate w-full">
+          <div className="text-[9px] font-bold text-[rgba(139,115,85,0.7)] mt-0.5 text-center truncate w-full uppercase">
             {sub}
           </div>
         ) : null}
         {badgeCount > 0 ? (
-          <div className="absolute top-2 right-2 min-w-[19px] h-[19px] px-1 rounded-[10px] bg-[rgb(244,67,54)] flex items-center justify-center">
+          <div className="absolute top-2 right-2 min-w-[19px] h-[19px] px-1 rounded-[10px] bg-[rgb(244,67,54)] flex items-center justify-center border-2 border-white">
             <div className="text-[9px] font-black text-white">
               {badgeCount > 99 ? "99+" : badgeCount}
             </div>
@@ -63,38 +63,36 @@ export default function LobbyQuickActions({
   onShowFriends: () => void;
   onShowSocieties: () => void;
   onShowLeaderboard: () => void;
-  onShowDailyQuiz?: () => void;
+  onShowDailyQuiz: () => void;
   friendsBadgeCount?: number;
 }) {
   return (
-    <div className="px-[14px] pt-2 pb-2">
+    <div className="px-[14px] pt-1 pb-2">
       <button
         onClick={onStartMatchSetup}
-        className="w-full rounded-[20px] mb-3 bg-[#FFA726] shadow-lg shadow-[rgba(255,167,38,0.38)]"
+        className="w-full rounded-[24px] mb-3 bg-[#FFA726] shadow-lg shadow-[rgba(255,167,38,0.3)] hover:scale-[1.01] active:scale-[0.98] transition-all"
       >
-        <div className="flex items-center px-6 py-5">
-          <div className="w-[50px] h-[50px] rounded-[15px] bg-[rgba(255,255,255,0.22)] flex items-center justify-center">
-            <Play size={28} color="#fff" strokeWidth={2.5} />
+        <div className="flex items-center px-6 py-4">
+          <div className="w-[48px] h-[48px] rounded-[14px] bg-[rgba(255,255,255,0.22)] flex items-center justify-center">
+            <Play size={26} color="#fff" strokeWidth={3} />
           </div>
           <div className="flex-1 ml-4 text-left">
-            <div className="text-[19px] font-black text-white">Start New Game</div>
-            <div className="text-[11px] font-bold text-white/80 mt-1 tracking-wide">
-              CHALLENGE FRIENDS OR AI
+            <div className="text-[17px] font-black text-white uppercase tracking-tight">Start New Game</div>
+            <div className="text-[10px] font-bold text-white/70 mt-0.5 tracking-widest uppercase">
+              Challenge Friends or AI
             </div>
           </div>
         </div>
       </button>
 
       <div className="flex gap-[10px] mb-[10px]">
-        {onShowDailyQuiz ? (
-          <GridTile
-            icon={BookOpen}
-            color="#8B5CF6"
-            label="Daily Quiz"
-            sub="+120 PESA"
-            onPress={onShowDailyQuiz}
-          />
-        ) : null}
+        <GridTile
+          icon={BookOpen}
+          color="#8B5CF6"
+          label="Daily Quiz"
+          sub="+120 PESA"
+          onPress={onShowDailyQuiz}
+        />
         <GridTile
           icon={Hash}
           color="#22C55E"
@@ -107,23 +105,23 @@ export default function LobbyQuickActions({
       <div className="flex gap-[10px]">
         <GridTile
           icon={Users}
-          color="#8B5CF6"
+          color="#6366F1"
           label="Societies"
-          sub="Global Clans"
+          sub="Clans"
           onPress={onShowSocieties}
         />
         <GridTile
           icon={Users}
           color="#F97316"
           label="Friends"
-          sub="Your Network"
+          sub="Network"
           onPress={onShowFriends}
           badgeCount={friendsBadgeCount}
         />
         <GridTile
           icon={Trophy}
           color="#FACC15"
-          label="Leaderboard"
+          label="Leader"
           sub="Rankings"
           onPress={onShowLeaderboard}
         />
