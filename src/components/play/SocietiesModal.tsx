@@ -190,23 +190,23 @@ export default function SocietiesModal({
                         </div>
 
                         {detailedSoc.myRole && (
-                            <div className="bg-white p-5 rounded-3xl border-2 border-black/[0.03] shadow-sm">
-                                <div className="flex items-center gap-2 mb-4">
+                            <div className="bg-white p-4 sm:p-5 rounded-3xl border-2 border-black/[0.03] shadow-sm">
+                                <div className="flex items-center gap-2 mb-3">
                                     <Coins className="text-brand-gold" size={18} />
-                                    <span className="text-xs font-black uppercase tracking-wider">Contribute Pesa</span>
+                                    <span className="text-[11px] font-black uppercase tracking-wider">Contribute Pesa</span>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-col xs:flex-row gap-2">
                                     <input
                                         type="number"
                                         value={contribAmount}
                                         onChange={(e) => setContribAmount(e.target.value)}
-                                        className="flex-1 bg-black/5 rounded-xl px-4 py-3 font-black text-sm outline-none focus:ring-2 ring-brand-gold/30"
+                                        className="w-full xs:flex-1 bg-black/5 rounded-xl px-4 py-3 font-black text-sm outline-none focus:ring-2 ring-brand-gold/30 min-w-0"
                                         placeholder="Amount..."
                                     />
                                     <button
                                         onClick={handleContribute}
                                         disabled={loading}
-                                        className="bg-brand-gold text-white px-6 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-brand-gold/20 active:scale-95 transition disabled:opacity-50"
+                                        className="w-full xs:w-auto bg-brand-gold text-white px-8 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest shadow-lg shadow-brand-gold/20 active:scale-95 transition disabled:opacity-50 whitespace-nowrap"
                                     >
                                         Donate
                                     </button>
