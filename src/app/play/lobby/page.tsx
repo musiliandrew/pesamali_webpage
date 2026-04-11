@@ -10,6 +10,10 @@ import type { WebDream } from "@/components/play/DreamCarousel";
 import AppHeader from "@/components/play/AppHeader";
 import LobbyStats from "@/components/play/LobbyStats";
 import LobbyQuickActions from "@/components/play/LobbyQuickActions";
+import FriendsModal from "@/components/play/FriendsModal";
+import SocietiesModal from "@/components/play/SocietiesModal";
+import LeaderboardModal from "@/components/play/LeaderboardModal";
+import DailyQuizModal from "@/components/play/DailyQuizModal";
 
 type Dream = {
   id: string;
@@ -45,6 +49,10 @@ export default function PlayLobbyPage() {
     tier?: string;
   }>({ pesaPoints: 0, pesaTokens: 0, streak: 0 });
   const [showMatchSetup, setShowMatchSetup] = useState(false);
+  const [showFriends, setShowFriends] = useState(false);
+  const [showSocieties, setShowSocieties] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showDailyQuiz, setShowDailyQuiz] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode>("ai");
   const [playerCount, setPlayerCount] = useState<number>(2);
   const [selectedDreamId, setSelectedDreamId] = useState<string>("");
@@ -373,7 +381,7 @@ export default function PlayLobbyPage() {
                 tier={meStats.tier || "Bronze"}
                 onPressTokens={() => { }}
                 onPressPoints={() => { }}
-                onPressLeaderboard={() => { }}
+                onPressLeaderboard={() => setShowLeaderboard(true)}
               />
             </div>
 
@@ -386,10 +394,10 @@ export default function PlayLobbyPage() {
               <LobbyQuickActions
                 onStartMatchSetup={() => setShowMatchSetup(true)}
                 onShowJoinCode={() => setShowJoinCode(true)}
-                onShowFriends={() => { }}
-                onShowSocieties={() => { }}
-                onShowLeaderboard={() => { }}
-                onShowDailyQuiz={() => setError("Coming soon")}
+                onShowFriends={() => setShowFriends(true)}
+                onShowSocieties={() => setShowSocieties(true)}
+                onShowLeaderboard={() => setShowLeaderboard(true)}
+                onShowDailyQuiz={() => setShowDailyQuiz(true)}
                 friendsBadgeCount={0}
               />
             </div>
@@ -456,6 +464,26 @@ export default function PlayLobbyPage() {
           setPlayerCount={setPlayerCount}
           onStart={handleStartFromSetup}
           starting={starting}
+        />
+
+        <FriendsModal
+          open={showFriends}
+          onClose={() => setShowFriends(false)}
+        />
+
+        <SocietiesModal
+          open={showSocieties}
+          onClose={() => setShowSocieties(false)}
+        />
+
+        <LeaderboardModal
+          open={showLeaderboard}
+          onClose={() => setShowLeaderboard(false)}
+        />
+
+        <DailyQuizModal
+          open={showDailyQuiz}
+          onClose={() => setShowDailyQuiz(false)}
         />
       </div>
     </main>
