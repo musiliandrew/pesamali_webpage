@@ -35,19 +35,36 @@ export default function SocietiesModal({
     useEffect(() => {
         if (!open) return;
         fetchSocieties();
-    }, [open]);
+    }, [open, apiBase]);
 
     const fetchSocieties = async () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch(`${apiBase}/api/societies`, {
-                headers: { Authorization: `Bearer ${getToken()}` },
+            const token = getToken();
+            if (!token) console.warn("[Societies] No token found during fetch");
+
+            const url = `${apiBase}/api/societies`;
+            console.log(`[Societies] Fetching from: ${url}`);
+
+            const res = await fetch(url, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Accept": "application/json"
+                },
             });
-            if (!res.ok) throw new Error("Failed to load societies");
+
+            if (!res.ok) {
+                const text = await res.text();
+                console.error(`[Societies] API Error: ${res.status}`, text);
+                throw new Error(`Server returned ${res.status}: ${text || "Unknown error"}`);
+            }
+
             const data = await res.json();
+            console.log(`[Societies] Received ${data.length} items`);
             setSocieties(data);
         } catch (e) {
+            console.error("[Societies] Fetch failed", e);
             setError(String(e));
         } finally {
             setLoading(false);
@@ -97,17 +114,36 @@ export default function SocietiesModal({
                         Loading societies...
                     </div>
                 ) : error ? (
-                    <div className="py-6 text-center text-brand-red text-sm font-bold bg-brand-red/5 rounded-xl border border-brand-red/20">
-                        {error}
+                    <div className="py-6 px-4 text-center">
+                        <div className="text-brand-red text-sm font-bold bg-brand-red/5 p-4 rounded-xl border border-brand-red/20 mb-4">
+                            {error}
+                        </div>
+                        <button
+                            onClick={fetchSocieties}
+                            className="px-6 py-2 bg-brand-gold text-white rounded-xl font-black text-xs uppercase tracking-widest"
+                        >
+                            Retry Connection
+                        </button>
                     </div>
                 ) : filteredSocieties.length === 0 ? (
                     <div className="py-12 text-center">
                         <div className="w-16 h-16 bg-black/5 rounded-full flex items-center justify-center mx-auto mb-4 opacity-20">
                             <Users size={32} />
                         </div>
-                        <div className="text-sm font-bold text-brand-dark/40">
-                            {tab === "my" ? "You haven't joined any societies yet" : "No societies available to join"}
+                        <div className="text-sm font-black text-brand-dark/40 uppercase tracking-tight">
+                            {tab === "my" ? "You haven't joined any societies yet" : "No new societies available"}
                         </div>
+                        {tab === "browse" && societies.length > 0 && (
+                            <p className="text-[10px] font-bold text-brand-dark/20 mt-2 uppercase">
+                                (You are already a member of all active societies)
+                            </p>
+                        )}
+                        <button
+                            onClick={fetchSocieties}
+                            className="mt-4 text-[10px] font-black underline text-brand-green uppercase tracking-widest"
+                        >
+                            Refresh List
+                        </button>
                     </div>
                 ) : (
                     <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1 no-scrollbar">
