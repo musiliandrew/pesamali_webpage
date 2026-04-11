@@ -14,6 +14,7 @@ import FriendsModal from "@/components/play/FriendsModal";
 import SocietiesModal from "@/components/play/SocietiesModal";
 import LeaderboardModal from "@/components/play/LeaderboardModal";
 import DailyQuizModal from "@/components/play/DailyQuizModal";
+import TokensModal from "@/components/play/TokensModal";
 
 type Dream = {
   id: string;
@@ -53,6 +54,7 @@ export default function PlayLobbyPage() {
   const [showSocieties, setShowSocieties] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showDailyQuiz, setShowDailyQuiz] = useState(false);
+  const [showTokens, setShowTokens] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode>("ai");
   const [playerCount, setPlayerCount] = useState<number>(2);
   const [selectedDreamId, setSelectedDreamId] = useState<string>("");
@@ -379,8 +381,8 @@ export default function PlayLobbyPage() {
                 streak={meStats.streak}
                 friendsCount={0}
                 tier={meStats.tier || "Bronze"}
-                onPressTokens={() => { }}
-                onPressPoints={() => { }}
+                onPressTokens={() => setShowTokens(true)}
+                onPressPoints={() => alert("Pesa Points are your total career earnings. High points unlock Elite Tiers!")}
                 onPressLeaderboard={() => setShowLeaderboard(true)}
               />
             </div>
@@ -484,6 +486,13 @@ export default function PlayLobbyPage() {
         <DailyQuizModal
           open={showDailyQuiz}
           onClose={() => setShowDailyQuiz(false)}
+        />
+
+        <TokensModal
+          open={showTokens}
+          onClose={() => setShowTokens(false)}
+          tokens={meStats.pesaTokens}
+          onGoToQuiz={() => setShowDailyQuiz(true)}
         />
       </div>
     </main>
