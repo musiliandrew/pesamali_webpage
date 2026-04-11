@@ -57,7 +57,7 @@ export default function LobbyStats({
   const progress = clamp(rawProgress, 0, 100);
 
   return (
-    <div className="mx-4 mt-3 overflow-hidden rounded-3xl shadow-[0_8px_24px_rgba(0,0,0,0.18)]">
+    <div className="mx-4 mt-2 overflow-hidden rounded-3xl shadow-[0_4px_16px_rgba(0,0,0,0.12)]">
       <div
         className="border border-white/40"
         style={{
@@ -66,114 +66,94 @@ export default function LobbyStats({
           backdropFilter: "blur(10px)",
         }}
       >
-        <div className="flex">
-          <div className="flex">
-            <div className="flex">
-              <button
-                className="flex-1 py-3 text-center"
-                onClick={onPressPoints}
-                type="button"
-              >
-                <div className="text-lg font-extrabold text-[rgb(45,80,22)] tracking-tight">
-                  {Number.isFinite(pesaPoints) ? pesaPoints.toLocaleString() : "0"}
-                </div>
-                <div className="flex items-center justify-center gap-1 mt-1">
-                  <div className="text-[10px] text-[rgba(93,78,55,1)] uppercase tracking-wider font-semibold">
-                    Pesa Points
-                  </div>
-                  <div className="bg-[rgba(45,80,22,0.10)] rounded-full w-4 h-4 flex items-center justify-center">
-                    <div className="text-[rgb(45,80,22)] font-bold text-[10px]">i</div>
-                  </div>
-                </div>
-              </button>
-
-              <div className="w-px bg-[rgba(45,80,22,0.10)] my-3" />
-
-              <button
-                className="flex-1 py-3 text-center"
-                onClick={onPressTokens}
-                type="button"
-              >
-                <div className="flex items-center justify-center gap-1">
-                  <div className="text-lg font-extrabold text-[#8B5CF6] tracking-tight">
-                    💎 {Number.isFinite(pesaTokens) ? pesaTokens : 0}
-                  </div>
-                  <div className="bg-[rgba(45,80,22,0.10)] rounded-full w-5 h-5 flex items-center justify-center">
-                    <div className="text-[rgb(45,80,22)] font-bold text-xs">+</div>
-                  </div>
-                </div>
-                <div className="mt-1 text-[10px] text-[rgba(93,78,55,1)] uppercase tracking-wider font-semibold">
-                  Pesa Tokens
-                </div>
-              </button>
+        {/* Top Row: Quick Stats */}
+        <div className="flex divide-x divide-[rgba(45,80,22,0.08)] border-b border-[rgba(45,80,22,0.08)]">
+          <button
+            className="flex-1 py-3 px-1 text-center hover:bg-black/5 transition-colors"
+            onClick={onPressPoints}
+            type="button"
+          >
+            <div className="text-base sm:text-lg font-black text-[rgb(45,80,22)] tracking-tight">
+              {Number.isFinite(pesaPoints) ? pesaPoints.toLocaleString() : "0"}
             </div>
-
-            <div className="h-px bg-[rgba(45,80,22,0.10)] mx-6" />
-
-            <div className="flex">
-              <div className="flex-1 py-3 text-center">
-                <div className="text-lg font-extrabold text-[#F59E0B] tracking-tight">
-                  🔥 {Number.isFinite(streak) ? streak : 0}
-                </div>
-                <div className="mt-0.5 text-[10px] text-[rgba(93,78,55,1)] uppercase tracking-wider font-semibold">
-                  Day Streak
-                </div>
-              </div>
-
-              <div className="w-px bg-[rgba(45,80,22,0.10)] my-2" />
-
-              <div className="flex-1 py-3 text-center">
-                <div className="text-lg font-extrabold text-[#10B981] tracking-tight">
-                  {Number.isFinite(friendsCount) ? friendsCount : 0}
-                </div>
-                <div className="mt-1 text-[10px] text-[rgba(93,78,55,1)] uppercase tracking-wider font-semibold">
-                  Friends Online
-                </div>
-              </div>
+            <div className="text-[9px] text-[rgba(93,78,55,0.7)] uppercase tracking-tighter font-bold">
+              Points
             </div>
+          </button>
 
-            <div className="h-px bg-[rgba(45,80,22,0.10)] mx-6" />
+          <button
+            className="flex-1 py-3 px-1 text-center hover:bg-black/5 transition-colors"
+            onClick={onPressTokens}
+            type="button"
+          >
+            <div className="text-base sm:text-lg font-black text-[#8B5CF6] tracking-tight">
+              💎 {Number.isFinite(pesaTokens) ? pesaTokens : 0}
+            </div>
+            <div className="text-[9px] text-[rgba(93,78,55,0.7)] uppercase tracking-tighter font-bold">
+              Tokens
+            </div>
+          </button>
 
-            <button className="px-4 py-3 w-full" onClick={onPressLeaderboard} type="button">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <div style={{ fontSize: 20 }}>{tierEmoji}</div>
-                  <div className="text-left">
-                    <div className="text-sm font-bold" style={{ color: tierColor }}>
-                      {tier} Tier
-                    </div>
-                    <div className="text-xs text-[rgba(93,78,55,1)]">
-                      {Number.isFinite(pesaPoints) ? pesaPoints.toLocaleString() : "0"} Total Points
-                    </div>
-                  </div>
-                </div>
+          <div className="flex-1 py-3 px-1 text-center">
+            <div className="text-base sm:text-lg font-black text-[#F59E0B] tracking-tight">
+              🔥 {Number.isFinite(streak) ? streak : 0}
+            </div>
+            <div className="text-[9px] text-[rgba(93,78,55,0.7)] uppercase tracking-tighter font-bold">
+              Streak
+            </div>
+          </div>
 
-                {tierInfo.nextThreshold ? (
-                  <div className="text-xs text-[rgba(93,78,55,1)]">
-                    {(tierInfo.nextThreshold - pesaPoints).toLocaleString()} to {tierInfo.next}
-                  </div>
-                ) : null}
-              </div>
-
-              {tierInfo.nextThreshold ? (
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full"
-                    style={{ width: `${progress}%`, backgroundColor: tierColor }}
-                  />
-                </div>
-              ) : null}
-
-              {tier === "Elite" ? (
-                <div className="text-center mt-2">
-                  <div className="text-xs font-semibold" style={{ color: tierColor }}>
-                    🌟 Maximum Tier Achieved! 🌟
-                  </div>
-                </div>
-              ) : null}
-            </button>
+          <div className="flex-1 py-3 px-1 text-center">
+            <div className="text-base sm:text-lg font-black text-[#10B981] tracking-tight">
+              {Number.isFinite(friendsCount) ? friendsCount : 0}
+            </div>
+            <div className="text-[9px] text-[rgba(93,78,55,0.7)] uppercase tracking-tighter font-bold">
+              Friends
+            </div>
           </div>
         </div>
+
+        {/* Bottom Row: Tier Progress */}
+        <button
+          className="px-4 py-3 w-full text-left hover:bg-black/5 transition-colors"
+          onClick={onPressLeaderboard}
+          type="button"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div style={{ fontSize: 24 }}>{tierEmoji}</div>
+              <div className="flex flex-col">
+                <div className="text-sm font-black" style={{ color: tierColor }}>
+                  {tier} Tier
+                </div>
+                <div className="text-[10px] font-bold text-[rgba(93,78,55,1)]">
+                  {Number.isFinite(pesaPoints) ? pesaPoints.toLocaleString() : "0"} Total Pesa
+                </div>
+              </div>
+            </div>
+
+            {tierInfo.nextThreshold ? (
+              <div className="text-[10px] text-right font-bold text-[rgba(93,78,55,0.7)] leading-tight">
+                {(tierInfo.nextThreshold - pesaPoints).toLocaleString()} <br />to {tierInfo.next}
+              </div>
+            ) : null}
+          </div>
+
+          {tierInfo.nextThreshold ? (
+            <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${progress}%`, backgroundColor: tierColor }}
+              />
+            </div>
+          ) : (
+            <div className="text-center">
+              <div className="text-[10px] font-black uppercase tracking-widest" style={{ color: tierColor }}>
+                🌟 Elite Master 🌟
+              </div>
+            </div>
+          )}
+        </button>
       </div>
     </div>
   );

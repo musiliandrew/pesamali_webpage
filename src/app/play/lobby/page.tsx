@@ -179,10 +179,10 @@ export default function PlayLobbyPage() {
                 const joinData: unknown = await joinResp.json();
                 const matchId =
                   joinData &&
-                  typeof joinData === "object" &&
-                  "match" in joinData &&
-                  (joinData as { match?: { id?: unknown } }).match &&
-                  typeof (joinData as { match?: { id?: unknown } }).match?.id === "string"
+                    typeof joinData === "object" &&
+                    "match" in joinData &&
+                    (joinData as { match?: { id?: unknown } }).match &&
+                    typeof (joinData as { match?: { id?: unknown } }).match?.id === "string"
                     ? (joinData as { match?: { id?: string } }).match?.id
                     : null;
 
@@ -333,125 +333,130 @@ export default function PlayLobbyPage() {
 
   return (
     <main
-      className="min-h-screen bg-cover bg-center"
+      className="h-[100dvh] overflow-hidden bg-cover bg-center"
       style={{ backgroundImage: "url('/Green_with_visuals_background.jpg')" }}
     >
-      <div className="min-h-screen bg-gradient-to-b from-[rgba(8,18,4,0.82)] via-[rgba(12,22,6,0.88)] to-[rgba(5,12,2,0.93)]">
-        <div className="min-h-screen">
-          <AppHeader
-            displayName={meName}
-            profession={null}
-            unreadCount={0}
-            onPressProfile={() => {}}
-            onPressNotifications={() => {}}
-          />
+      <div className="h-full bg-gradient-to-b from-[rgba(8,18,4,0.85)] via-[rgba(12,22,6,0.90)] to-[rgba(5,12,2,0.95)] flex flex-col">
+        <AppHeader
+          displayName={meName}
+          profession={null}
+          unreadCount={0}
+          onPressProfile={() => { }}
+          onPressNotifications={() => { }}
+        />
 
-          <div className="max-w-2xl mx-auto">
-            <div className="flex items-center justify-center pt-3 pb-1">
+        <div className="flex-1 overflow-y-auto no-scrollbar pb-4">
+          <div className="max-w-2xl mx-auto flex flex-col h-full">
+            <div className="flex items-center justify-center pt-1 pb-0 sm:pt-4">
               <Image
                 src="/coverpesa_mali_page-0004-removebg-preview.png"
                 alt="PesaMali"
                 width={900}
                 height={420}
-                className="w-[min(520px,80vw)] h-auto"
+                className="w-[min(320px,60vw)] sm:w-[520px] h-auto"
                 priority
               />
             </div>
 
             {error && (
-              <div className="mx-4 mt-3 rounded-xl border border-brand-red/40 bg-brand-red/10 p-3 text-sm text-brand-cream">
+              <div className="mx-4 mt-1 rounded-xl border border-brand-red/40 bg-brand-red/10 p-2 text-[10px] text-brand-cream text-center">
                 {error}
               </div>
             )}
 
-            <LobbyStats
-              pesaPoints={meStats.pesaPoints}
-              pesaTokens={meStats.pesaTokens}
-              streak={meStats.streak}
-              friendsCount={0}
-              tier={meStats.tier || "Bronze"}
-              onPressTokens={() => {}}
-              onPressPoints={() => {}}
-              onPressLeaderboard={() => {}}
-            />
-
-            <div className="px-4 mt-5">
-              <div className="text-white text-[13px] font-black tracking-[2px]">MENU</div>
+            <div className="mt-0 sm:mt-2">
+              <LobbyStats
+                pesaPoints={meStats.pesaPoints}
+                pesaTokens={meStats.pesaTokens}
+                streak={meStats.streak}
+                friendsCount={0}
+                tier={meStats.tier || "Bronze"}
+                onPressTokens={() => { }}
+                onPressPoints={() => { }}
+                onPressLeaderboard={() => { }}
+              />
             </div>
 
-            <LobbyQuickActions
-              onStartMatchSetup={() => setShowMatchSetup(true)}
-              onShowJoinCode={() => setShowJoinCode(true)}
-              onShowFriends={() => {}}
-              onShowSocieties={() => {}}
-              onShowLeaderboard={() => {}}
-              onShowDailyQuiz={() => setError("Coming soon")}
-              friendsBadgeCount={0}
-            />
+            <div className="px-5 mt-4 sm:mt-6 mb-1 flex justify-between items-center">
+              <div className="text-white text-[11px] font-black tracking-[2.5px] opacity-70 uppercase">Lobby Menu</div>
+              <div className="h-[1px] flex-1 bg-white/10 ml-3" />
+            </div>
 
-            <div className="px-4 pb-10">
+            <div className="flex-1">
+              <LobbyQuickActions
+                onStartMatchSetup={() => setShowMatchSetup(true)}
+                onShowJoinCode={() => setShowJoinCode(true)}
+                onShowFriends={() => { }}
+                onShowSocieties={() => { }}
+                onShowLeaderboard={() => { }}
+                onShowDailyQuiz={() => setError("Coming soon")}
+                friendsBadgeCount={0}
+              />
+            </div>
+
+            <div className="px-5 mt-4 pb-4">
               <button
                 onClick={signOut}
-                className="w-full text-sm px-4 py-3 rounded-2xl border border-white/15 text-white/80 hover:text-white hover:border-white/30 transition"
+                className="w-full text-[11px] font-black uppercase tracking-wider py-3 rounded-2xl border border-white/10 text-white/40 hover:text-white hover:border-white/30 transition bg-white/5 active:scale-[0.98]"
               >
-                Sign out
+                Logout Account
               </button>
             </div>
           </div>
+        </div>
 
-          {showJoinCode && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div
-                className="absolute inset-0 bg-black/60"
-                onClick={() => (joining ? null : setShowJoinCode(false))}
+        {showJoinCode && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-black/60"
+              onClick={() => (joining ? null : setShowJoinCode(false))}
+            />
+            <div className="relative w-full max-w-md rounded-2xl bg-brand-cream text-brand-dark border border-[rgba(212,175,55,0.35)] p-6">
+              <div className="text-lg font-extrabold mb-1">Join with lobby code</div>
+              <div className="text-sm text-brand-dark/60 mb-4">
+                Enter a code like PESA-1234
+              </div>
+
+              <input
+                value={joinCode}
+                onChange={(e) => setJoinCode(e.target.value)}
+                placeholder="PESA-1234"
+                className="w-full rounded-xl bg-white border-2 border-[rgba(139,115,85,0.28)] px-4 py-3 font-extrabold tracking-widest uppercase outline-none"
               />
-              <div className="relative w-full max-w-md rounded-2xl bg-brand-cream text-brand-dark border border-[rgba(212,175,55,0.35)] p-6">
-                <div className="text-lg font-extrabold mb-1">Join with lobby code</div>
-                <div className="text-sm text-brand-dark/60 mb-4">
-                  Enter a code like PESA-1234
-                </div>
 
-                <input
-                  value={joinCode}
-                  onChange={(e) => setJoinCode(e.target.value)}
-                  placeholder="PESA-1234"
-                  className="w-full rounded-xl bg-white border-2 border-[rgba(139,115,85,0.28)] px-4 py-3 font-extrabold tracking-widest uppercase outline-none"
-                />
-
-                <div className="flex gap-3 mt-5">
-                  <button
-                    onClick={() => setShowJoinCode(false)}
-                    disabled={joining}
-                    className="flex-1 rounded-xl border border-[rgba(139,115,85,0.35)] px-4 py-3 font-extrabold"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={joinByCode}
-                    disabled={joining || joinCode.trim().length === 0}
-                    className="flex-1 rounded-xl bg-brand-gold hover:bg-brand-gold-light disabled:opacity-50 px-4 py-3 font-extrabold text-white"
-                  >
-                    {joining ? "Joining…" : "Join"}
-                  </button>
-                </div>
+              <div className="flex gap-3 mt-5">
+                <button
+                  onClick={() => setShowJoinCode(false)}
+                  disabled={joining}
+                  className="flex-1 rounded-xl border border-[rgba(139,115,85,0.35)] px-4 py-3 font-extrabold"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={joinByCode}
+                  disabled={joining || joinCode.trim().length === 0}
+                  className="flex-1 rounded-xl bg-brand-gold hover:bg-brand-gold-light disabled:opacity-50 px-4 py-3 font-extrabold text-white"
+                >
+                  {joining ? "Joining…" : "Join"}
+                </button>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          <MatchSetupModal
-            open={showMatchSetup}
-            onClose={() => setShowMatchSetup(false)}
-            dreams={dreams as WebDream[]}
-            selectedDreamId={selectedDreamId}
-            setSelectedDreamId={setSelectedDreamId}
-            gameMode={gameMode}
-            setGameMode={setGameMode}
-            playerCount={playerCount}
-            setPlayerCount={setPlayerCount}
-            onStart={handleStartFromSetup}
-            starting={starting}
-          />
-        </div>
+        <MatchSetupModal
+          open={showMatchSetup}
+          onClose={() => setShowMatchSetup(false)}
+          dreams={dreams as WebDream[]}
+          selectedDreamId={selectedDreamId}
+          setSelectedDreamId={setSelectedDreamId}
+          gameMode={gameMode}
+          setGameMode={setGameMode}
+          playerCount={playerCount}
+          setPlayerCount={setPlayerCount}
+          onStart={handleStartFromSetup}
+          starting={starting}
+        />
       </div>
     </main>
   );
