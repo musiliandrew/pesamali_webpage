@@ -85,12 +85,10 @@ export default function PlayRegisterPage() {
         throw new Error(text || `Registration failed (${res.status})`);
       }
 
-      const data = (await res.json()) as { token: string; user: AuthUser };
-      if (!data?.token) throw new Error("No token returned");
+      await res.json();
 
-      setToken(data.token);
-      localStorage.setItem("pm_user", JSON.stringify(data.user || null));
-      router.replace("/play/lobby");
+      // Redirect to verification
+      router.push(`/play/verify-otp?email=${encodeURIComponent(email)}&mode=register`);
     } catch (e) {
       setError(String(e));
     } finally {

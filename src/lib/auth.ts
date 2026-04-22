@@ -25,3 +25,15 @@ export async function validateToken(token: string): Promise<boolean> {
   });
   return res.ok;
 }
+
+export function getUserIdFromToken(): string | null {
+  const token = getToken();
+  if (!token) return null;
+  try {
+    const payloadBase64 = token.split(".")[1];
+    const decoded = JSON.parse(atob(payloadBase64));
+    return decoded.sub ? String(decoded.sub) : null;
+  } catch {
+    return null;
+  }
+}

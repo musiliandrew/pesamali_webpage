@@ -2,14 +2,17 @@
 
 import { useEffect, useState, useMemo } from "react";
 import OverlayModal from "./OverlayModal";
-import { Brain, Star, Clock, CheckCircle2, XCircle, ArrowRight, Trophy } from "lucide-react";
+import { Brain, Star, Clock, CheckCircle2, XCircle, ArrowRight, Trophy, Info } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/env";
 import { getToken } from "@/lib/auth";
 
 type Question = {
     id: string;
-    text: string;
-    options: { [key: string]: string };
+    question_text: string;
+    option_a: string;
+    option_b: string;
+    option_c: string;
+    option_d: string;
 };
 
 type QuizSession = {
@@ -72,8 +75,15 @@ export default function DailyQuizModal({
         }
     };
 
+    const [feedback, setFeedback] = useState<{
+        isCorrect: boolean;
+        correctAnswer: string;
+        explanation: string;
+        userAnswer: string;
+    } | null>(null);
+
     const submitAnswer = async (option: string) => {
-        if (!session) return;
+        if (!session || feedback) return;
         const q = session.questions[currentIdx];
         setLoading(true);
         try {
@@ -88,15 +98,24 @@ export default function DailyQuizModal({
             if (res.ok) {
                 const data = await res.json();
                 setAnswers(prev => ({ ...prev, [q.id]: option }));
-
-                if (currentIdx < session.questions.length - 1) {
-                    setCurrentIdx(currentIdx + 1);
-                } else {
-                    completeQuiz();
-                }
+                setFeedback({
+                    isCorrect: data.is_correct,
+                    correctAnswer: data.correct_answer,
+                    explanation: data.explanation,
+                    userAnswer: option
+                });
             }
         } catch { } finally {
             setLoading(false);
+        }
+    };
+
+    const nextQuestion = () => {
+        setFeedback(null);
+        if (currentIdx < (session?.questions.length || 0) - 1) {
+            setCurrentIdx(currentIdx + 1);
+        } else {
+            completeQuiz();
         }
     };
 
@@ -177,25 +196,73 @@ export default function DailyQuizModal({
 
                     <div className="min-h-[100px] flex items-center justify-center text-center mb-8 px-2">
                         <h3 className="text-lg font-black text-brand-dark leading-tight tracking-tight uppercase">
-                            {currentQuestion.text}
+                            {currentQuestion.question_text}
                         </h3>
                     </div>
 
                     <div className="grid grid-cols-1 gap-3">
-                        {Object.entries(currentQuestion.options).map(([key, value]) => (
-                            <button
-                                key={key}
-                                onClick={() => submitAnswer(key)}
-                                disabled={loading}
-                                className="group w-full p-4 rounded-2xl bg-white border-2 border-black/[0.04] text-left hover:border-brand-gold transition-all active:scale-[0.98] flex items-center gap-4"
-                            >
-                                <div className="w-10 h-10 rounded-xl bg-black/5 flex items-center justify-center font-black group-hover:bg-brand-gold group-hover:text-white transition-colors">
-                                    {key}
-                                </div>
-                                <div className="flex-1 text-sm font-bold text-brand-dark/80">{value}</div>
-                            </button>
-                        ))}
+                        {[
+                            { key: 'A', value: currentQuestion.option_a },
+                            { key: 'B', value: currentQuestion.option_b },
+                            { key: 'C', value: currentQuestion.option_c },
+                            { key: 'D', value: currentQuestion.option_d },
+                        ].map((opt) => {
+                            const isSelected = feedback?.userAnswer === opt.key;
+                            const isCorrect = opt.key === feedback?.correctAnswer;
+                            const showSuccess = feedback && isCorrect;
+                            const showError = feedback && isSelected && !feedback.isCorrect;
+
+                            return (
+                                <button
+                                    key={opt.key}
+                                    onClick={() => submitAnswer(opt.key)}
+                                    disabled={loading || !!feedback}
+                                    className={`group w-full p-4 rounded-2xl border-2 transition-all active:scale-[0.98] flex items-center gap-4 ${showSuccess ? 'bg-emerald-50 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.2)]' :
+                                        showError ? 'bg-red-50 border-red-500' :
+                                            'bg-white border-black/[0.04] hover:border-brand-gold'
+                                        }`}
+                                >
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black transition-colors ${showSuccess ? 'bg-emerald-500 text-white' :
+                                        showError ? 'bg-red-500 text-white' :
+                                            'bg-black/5 group-hover:bg-brand-gold group-hover:text-white'
+                                        }`}>
+                                        {opt.key}
+                                    </div>
+                                    <div className={`flex-1 text-sm font-bold ${showSuccess ? 'text-emerald-900' : showError ? 'text-red-900' : 'text-brand-dark/80'}`}>
+                                        {opt.value}
+                                    </div>
+                                    {showSuccess && <CheckCircle2 className="text-emerald-500 shrink-0" size={20} />}
+                                    {showError && <XCircle className="text-red-500 shrink-0" size={20} />}
+                                </button>
+                            );
+                        })}
                     </div>
+
+                    {feedback && (
+                        <div className="mt-8 animate-in slide-in-from-bottom-4 fade-in duration-500">
+                            <div className={`p-5 rounded-[24px] mb-6 ${feedback.isCorrect ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-red-500/10 border border-red-500/20'}`}>
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className={`p-2 rounded-lg ${feedback.isCorrect ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
+                                        {feedback.isCorrect ? <Trophy size={16} /> : <Info size={16} />}
+                                    </div>
+                                    <span className={`text-[10px] font-black uppercase tracking-widest ${feedback.isCorrect ? 'text-emerald-600' : 'text-red-600'}`}>
+                                        {feedback.isCorrect ? 'Brilliant!' : 'Not Quite...'}
+                                    </span>
+                                </div>
+                                <p className="text-[11px] font-bold text-brand-dark/70 leading-relaxed uppercase">
+                                    {feedback.explanation}
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={nextQuestion}
+                                className="w-full py-5 rounded-2xl bg-brand-dark text-white text-base font-black uppercase tracking-widest shadow-xl shadow-brand-dark/20 hover:scale-[1.02] active:scale-95 transition flex items-center justify-center gap-2"
+                            >
+                                {currentIdx < session.questions.length - 1 ? 'Next Question' : 'See My Rewards'}
+                                <ArrowRight size={20} />
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
 

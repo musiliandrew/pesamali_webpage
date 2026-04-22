@@ -15,6 +15,8 @@ import SocietiesModal from "@/components/play/SocietiesModal";
 import LeaderboardModal from "@/components/play/LeaderboardModal";
 import DailyQuizModal from "@/components/play/DailyQuizModal";
 import TokensModal from "@/components/play/TokensModal";
+import NotificationsModal from "@/components/play/NotificationsModal";
+import SettingsModal from "@/components/play/SettingsModal";
 
 type Dream = {
   id: string;
@@ -47,8 +49,9 @@ export default function PlayLobbyPage() {
     pesaPoints: number;
     pesaTokens: number;
     streak: number;
+    friendsCount: number;
     tier?: string;
-  }>({ pesaPoints: 0, pesaTokens: 0, streak: 0 });
+  }>({ pesaPoints: 0, pesaTokens: 0, streak: 0, friendsCount: 0 });
   const [showMatchSetup, setShowMatchSetup] = useState(false);
   const [showFriends, setShowFriends] = useState(false);
   const [showSocieties, setShowSocieties] = useState(false);
@@ -58,6 +61,9 @@ export default function PlayLobbyPage() {
   const [gameMode, setGameMode] = useState<GameMode>("ai");
   const [playerCount, setPlayerCount] = useState<number>(2);
   const [selectedDreamId, setSelectedDreamId] = useState<string>("");
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   function isAvailableLobby(x: unknown): x is { id: string; size: number; needsPlayers: number } {
     if (!x || typeof x !== "object") return false;
@@ -69,77 +75,121 @@ export default function PlayLobbyPage() {
     );
   }
 
-  useEffect(() => {
-    let cancelled = false;
+  const initData = async () => {
+    const token = getToken();
+    if (!token) {
+      router.replace("/play/login");
+      return;
+    }
 
-    const run = async () => {
-      const token = getToken();
-      if (!token) {
-        router.replace("/play/login");
-        return;
+    const ok = await validateToken(token).catch(() => false);
+    if (!ok) {
+      clearAuth();
+      router.replace("/play/login");
+      return;
+    }
+
+    try {
+      const cached = localStorage.getItem("pm_user");
+      if (cached) {
+        const parsed = JSON.parse(cached) as {
+          displayName?: string;
+          pesaPoints?: number;
+          pesaTokens?: number;
+          streak?: number;
+          friendsCount?: number;
+          tier?: string;
+        };
+        if (parsed?.displayName) setMeName(parsed.displayName);
+        setMeStats({
+          pesaPoints: typeof parsed?.pesaPoints === "number" ? parsed.pesaPoints : 0,
+          pesaTokens: typeof parsed?.pesaTokens === "number" ? parsed.pesaTokens : 0,
+          streak: typeof parsed?.streak === "number" ? parsed.streak : 0,
+          friendsCount: typeof parsed?.friendsCount === "number" ? parsed.friendsCount : 0,
+          tier: parsed?.tier,
+        });
       }
 
-      const ok = await validateToken(token).catch(() => false);
-      if (cancelled) return;
-      if (!ok) {
+      // Fetch fresh stats from backend
+      const statsRes = await fetch(`${apiBase}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (statsRes.ok) {
+        const user = await statsRes.json();
+        setMeName(user.displayName);
+        setMeStats((prev) => ({
+          ...prev,
+          pesaPoints: user.pesaPoints ?? 0,
+          pesaTokens: user.pesaTokens ?? 0,
+          streak: user.streak ?? 0,
+          tier: user.tier || "Bronze",
+        }));
+        localStorage.setItem("pm_user", JSON.stringify({
+          id: user.id,
+          displayName: user.displayName,
+          pesaPoints: user.pesaPoints,
+          pesaTokens: user.pesaTokens,
+          streak: user.streak,
+          tier: user.tier
+        }));
+      }
+    } catch {
+      // ignore
+    }
+
+    try {
+      const fRes = await fetch(`${apiBase}/api/friends`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (fRes.ok) {
+        const friends = await fRes.json();
+        if (Array.isArray(friends)) {
+          setMeStats(prev => ({ ...prev, friendsCount: friends.length }));
+        }
+      }
+    } catch { /* ignore friends fetch failure */ }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`${apiBase}/api/dreams`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.status === 401) {
         clearAuth();
         router.replace("/play/login");
         return;
       }
 
-      try {
-        const cached = localStorage.getItem("pm_user");
-        if (cached) {
-          const parsed = JSON.parse(cached) as {
-            displayName?: string;
-            pesaPoints?: number;
-            pesaTokens?: number;
-            streak?: number;
-            tier?: string;
-          };
-          if (parsed?.displayName) setMeName(parsed.displayName);
-          setMeStats({
-            pesaPoints: typeof parsed?.pesaPoints === "number" ? parsed.pesaPoints : 0,
-            pesaTokens: typeof parsed?.pesaTokens === "number" ? parsed.pesaTokens : 0,
-            streak: typeof parsed?.streak === "number" ? parsed.streak : 0,
-            tier: parsed?.tier,
-          });
-        }
-      } catch {
-        // ignore
+      if (!res.ok) throw new Error(`Failed to load dreams (${res.status})`);
+      const data = (await res.json()) as Dream[];
+      setDreams(data || []);
+      if (data && data.length > 0) {
+        setSelectedDreamId((prev) => prev || data[0].id);
       }
+    } finally {
+      setLoading(false);
+    }
 
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch(`${apiBase}/api/dreams`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+    fetchUnread();
+  };
 
-        if (res.status === 401) {
-          clearAuth();
-          router.replace("/play/login");
-          return;
-        }
-
-        if (!res.ok) throw new Error(`Failed to load dreams (${res.status})`);
-        const data = (await res.json()) as Dream[];
-        setDreams(data || []);
-        if (data && data.length > 0) {
-          setSelectedDreamId((prev) => prev || data[0].id);
-        }
-      } catch (e) {
-        setError(String(e));
-      } finally {
-        setLoading(false);
+  const fetchUnread = async () => {
+    try {
+      const res = await fetch(`${apiBase}/api/notifications/unread-count`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUnreadCount(data.unread_count);
       }
-    };
+    } catch { }
+  };
 
-    run();
-    return () => {
-      cancelled = true;
-    };
-  }, [apiBase, router]);
+  useEffect(() => {
+    initData();
+  }, []);
 
   const handleStartFromSetup = async () => {
     const token = getToken();
@@ -349,10 +399,10 @@ export default function PlayLobbyPage() {
       <div className="h-full bg-gradient-to-b from-[rgba(8,18,4,0.85)] via-[rgba(12,22,6,0.90)] to-[rgba(5,12,2,0.95)] flex flex-col">
         <AppHeader
           displayName={meName}
-          profession={null}
-          unreadCount={0}
-          onPressProfile={() => { }}
-          onPressNotifications={() => { }}
+          profession={meStats.tier}
+          unreadCount={unreadCount}
+          onPressProfile={() => setShowSettings(true)}
+          onPressNotifications={() => setShowNotifications(true)}
         />
 
         <div className="flex-1 overflow-y-auto no-scrollbar pb-4">
@@ -379,7 +429,7 @@ export default function PlayLobbyPage() {
                 pesaPoints={meStats.pesaPoints}
                 pesaTokens={meStats.pesaTokens}
                 streak={meStats.streak}
-                friendsCount={0}
+                friendsCount={meStats.friendsCount}
                 tier={meStats.tier || "Bronze"}
                 onPressTokens={() => setShowTokens(true)}
                 onPressPoints={() => alert("Pesa Points are your total career earnings. High points unlock Elite Tiers!")}
@@ -493,6 +543,20 @@ export default function PlayLobbyPage() {
           onClose={() => setShowTokens(false)}
           tokens={meStats.pesaTokens}
           onGoToQuiz={() => setShowDailyQuiz(true)}
+          onRefresh={initData}
+        />
+
+        <NotificationsModal
+          open={showNotifications}
+          onClose={() => setShowNotifications(false)}
+          onRefreshCount={fetchUnread}
+        />
+
+        <SettingsModal
+          open={showSettings}
+          onClose={() => setShowSettings(false)}
+          userData={{ ...meStats, displayName: meName, email: "" }}
+          onRefresh={initData}
         />
       </div>
     </main>

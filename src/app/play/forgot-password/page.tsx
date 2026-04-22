@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
             });
 
             if (res.ok) {
-                setStep('VERIFY');
+                router.push(`/play/verify-otp?email=${encodeURIComponent(email)}&mode=reset`);
             } else {
                 const data = await res.json();
                 setError(data.detail || "Failed to send OTP");

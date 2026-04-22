@@ -66,7 +66,18 @@ export default function PlayLoginPage() {
 
       if (!res.ok) {
         const text = await res.text().catch(() => "");
-        throw new Error(text || `Login failed (${res.status})`);
+        let errorMessage = text;
+        try {
+          const data = JSON.parse(text);
+          errorMessage = data.detail || text;
+        } catch { }
+
+        if (res.status === 403) {
+          // Redirect to verification
+          router.push(`/play/verify-otp?email=${encodeURIComponent(email)}&mode=register`);
+          return;
+        }
+        throw new Error(errorMessage || `Login failed (${res.status})`);
       }
 
       const data = (await res.json()) as { token: string; user: AuthUser };
