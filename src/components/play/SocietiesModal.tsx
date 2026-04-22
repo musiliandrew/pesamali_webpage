@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import OverlayModal from "./OverlayModal";
-import { Users, Plus, Shield, ArrowRight, TrendingUp, Info, ChevronLeft, Target, Coins } from "lucide-react";
+import { Users, Plus, Shield, ArrowRight, TrendingUp, Info, ChevronLeft, Target, Coins, Gift } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/env";
 import { getToken } from "@/lib/auth";
 
@@ -137,6 +137,62 @@ export default function SocietiesModal({
         }
     };
 
+    const handleBookBulk = async (amount: number) => {
+        if (!selectedId) return;
+        setLoading(true);
+        try {
+            const res = await fetch(`${apiBase}/api/societies/${selectedId}/bulk-booking`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${getToken()}`,
+                },
+                body: JSON.stringify({ token_amount: amount }),
+            });
+            if (!res.ok) throw new Error(await res.text());
+            const data = await res.json();
+            alert(`Booking created! ID: ${data.bookingId}. Total price: ${data.totalPrice} bob. Once paid, verify and distribute.`);
+            // In a real app, we'd show the payment UI here
+            handleVerifyBulk(data.bookingId);
+        } catch (e) {
+            alert(String(e));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleVerifyBulk = async (bookingId: string) => {
+        if (!selectedId) return;
+        try {
+            const res = await fetch(`${apiBase}/api/societies/${selectedId}/bulk-verify/${bookingId}`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            if (!res.ok) throw new Error(await res.text());
+            const data = await res.json();
+            alert(`Payment verified! Status: ${data.status}. Now distributing to ${detailedSoc?.memberCount} members...`);
+            handleDistributeBulk(bookingId);
+        } catch (e) {
+            alert(String(e));
+        }
+    };
+
+    const handleDistributeBulk = async (bookingId: string) => {
+        if (!selectedId) return;
+        try {
+            const res = await fetch(`${apiBase}/api/societies/${selectedId}/bulk-distribute/${bookingId}`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            if (!res.ok) throw new Error(await res.text());
+            const data = await res.json();
+            alert(`Distribution complete! Each member received ${data.tokensPerMember} tokens. Total distributed: ${data.totalDistributed}.`);
+            fetchDetailedSociety(selectedId);
+        } catch (e) {
+            alert(String(e));
+        }
+    };
+
     const filteredSocieties = societies.filter((s) =>
         tab === "my" ? s.myRole : !s.myRole
     );
@@ -210,6 +266,52 @@ export default function SocietiesModal({
                                     >
                                         Donate
                                     </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* BULK ECONOMY (Teacher Model) */}
+                        {detailedSoc.myRole && (detailedSoc.myRole === 'owner' || detailedSoc.myRole === 'admin') && detailedSoc.memberCount > 20 && (
+                            <div className="bg-brand-primary/5 p-5 rounded-[32px] border-2 border-brand-primary/20">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 bg-brand-primary/10 rounded-xl flex items-center justify-center">
+                                            <Gift className="text-brand-primary" size={16} />
+                                        </div>
+                                        <span className="text-[11px] font-black uppercase tracking-wider text-brand-primary">Bulk Token Economy</span>
+                                    </div>
+                                    <div className="px-2 py-0.5 rounded-lg bg-brand-primary text-white text-[8px] font-black uppercase">
+                                        Enabled
+                                    </div>
+                                </div>
+
+                                <p className="text-[10px] font-bold text-brand-primary/60 mb-4 leading-relaxed uppercase tracking-tight">
+                                    Society Discount Unlocked! Buy tokens at 10 bob (instead of 15) and distribute equally to all {detailedSoc.memberCount} members.
+                                </p>
+
+                                <div className="space-y-3">
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="number"
+                                            id="bulkAmount"
+                                            className="flex-1 bg-white border-2 border-brand-primary/10 rounded-2xl px-4 py-3 font-black text-sm outline-none focus:border-brand-primary/40"
+                                            placeholder="Tokens to book..."
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                const amt = (document.getElementById('bulkAmount') as HTMLInputElement)?.value;
+                                                if (amt) handleBookBulk(parseInt(amt));
+                                            }}
+                                            className="bg-brand-primary text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-brand-primary/20"
+                                        >
+                                            Book
+                                        </button>
+                                    </div>
+
+                                    <div className="flex items-center justify-between bg-white/50 p-3 rounded-2xl border border-dashed border-brand-primary/20">
+                                        <div className="text-[9px] font-black text-brand-primary/40 uppercase">Economic Model</div>
+                                        <div className="text-[10px] font-black text-brand-primary uppercase">1 Token = 10 Bob</div>
+                                    </div>
                                 </div>
                             </div>
                         )}

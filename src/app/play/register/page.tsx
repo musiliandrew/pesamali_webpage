@@ -51,6 +51,7 @@ export default function PlayRegisterPage() {
   const [password, setPassword] = useState("");
   const [age, setAge] = useState("");
   const [professionId, setProfessionId] = useState("dev");
+  const [referralCode, setReferralCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +78,7 @@ export default function PlayRegisterPage() {
           display_name: displayName,
           profession_id: professionId,
           age: Number(age),
+          referral_code: referralCode.trim() || null,
         }),
       });
 
@@ -235,6 +237,21 @@ export default function PlayRegisterPage() {
                           placeholder="e.g. dev, med"
                         />
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 sm:space-y-2">
+                    <div className="text-[10px] sm:text-xs font-extrabold text-[rgba(60,45,30,0.75)] uppercase tracking-wider ml-1">
+                      🎟️ Referral Code (Optional)
+                    </div>
+                    <div className="flex items-center bg-white border-2 border-[rgba(139,115,85,0.28)] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-sm">
+                      <input
+                        className="flex-1 text-sm sm:text-base text-[rgb(26,26,26)] font-bold outline-none text-brand-primary placeholder:font-normal"
+                        value={referralCode}
+                        onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                        placeholder="Enter friend's code for bonus! 💎"
+                        autoCapitalize="characters"
+                      />
                     </div>
                   </div>
 

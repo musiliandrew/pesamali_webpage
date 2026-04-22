@@ -17,6 +17,7 @@ import DailyQuizModal from "@/components/play/DailyQuizModal";
 import TokensModal from "@/components/play/TokensModal";
 import NotificationsModal from "@/components/play/NotificationsModal";
 import SettingsModal from "@/components/play/SettingsModal";
+import ReferralModal from "@/components/ReferralModal";
 
 type Dream = {
   id: string;
@@ -63,6 +64,7 @@ export default function PlayLobbyPage() {
   const [selectedDreamId, setSelectedDreamId] = useState<string>("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showReferral, setShowReferral] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
   function isAvailableLobby(x: unknown): x is { id: string; size: number; needsPlayers: number } {
@@ -403,6 +405,7 @@ export default function PlayLobbyPage() {
           unreadCount={unreadCount}
           onPressProfile={() => setShowSettings(true)}
           onPressNotifications={() => setShowNotifications(true)}
+          onPressInvite={() => setShowReferral(true)}
         />
 
         <div className="flex-1 overflow-y-auto no-scrollbar pb-4">
@@ -450,6 +453,7 @@ export default function PlayLobbyPage() {
                 onShowSocieties={() => setShowSocieties(true)}
                 onShowLeaderboard={() => setShowLeaderboard(true)}
                 onShowDailyQuiz={() => setShowDailyQuiz(true)}
+                onShowReferral={() => setShowReferral(true)}
                 friendsBadgeCount={0}
               />
             </div>
@@ -557,6 +561,11 @@ export default function PlayLobbyPage() {
           onClose={() => setShowSettings(false)}
           userData={{ ...meStats, displayName: meName, email: "" }}
           onRefresh={initData}
+        />
+
+        <ReferralModal
+          isOpen={showReferral}
+          onClose={() => setShowReferral(false)}
         />
       </div>
     </main>

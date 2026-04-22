@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Settings, ArrowLeft } from "lucide-react";
+import { Bell, Settings, ArrowLeft, Gift } from "lucide-react";
 
 export default function AppHeader({
   displayName,
@@ -8,6 +8,7 @@ export default function AppHeader({
   unreadCount = 0,
   onPressNotifications,
   onPressProfile,
+  onPressInvite,
   showBackButton = false,
   onPressBack,
   title,
@@ -17,6 +18,7 @@ export default function AppHeader({
   unreadCount?: number;
   onPressNotifications?: () => void;
   onPressProfile?: () => void;
+  onPressInvite?: () => void;
   showBackButton?: boolean;
   onPressBack?: () => void;
   title?: string;
@@ -75,6 +77,15 @@ export default function AppHeader({
               {hasUnread ? (
                 <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[rgb(244,67,54)] border-2 border-[rgb(255,254,248)]" />
               ) : null}
+            </button>
+          ) : null}
+
+          {onPressInvite ? (
+            <button
+              onClick={onPressInvite}
+              className="w-11 h-11 rounded-full bg-brand-gold/10 border border-brand-gold/30 shadow-sm flex items-center justify-center group hover:bg-brand-gold/20 transition"
+            >
+              <Gift size={20} className="text-brand-gold group-hover:scale-110 transition" />
             </button>
           ) : null}
 

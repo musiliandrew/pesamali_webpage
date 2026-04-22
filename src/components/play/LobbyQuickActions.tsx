@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, Users, Trophy, Hash, BookOpen, type LucideIcon } from "lucide-react";
+import { Play, Users, Trophy, Hash, BookOpen, Gift, type LucideIcon } from "lucide-react";
 
 function GridTile({
   icon: Icon,
@@ -56,6 +56,7 @@ export default function LobbyQuickActions({
   onShowSocieties,
   onShowLeaderboard,
   onShowDailyQuiz,
+  onShowReferral,
   friendsBadgeCount = 0,
 }: {
   onStartMatchSetup: () => void;
@@ -64,6 +65,7 @@ export default function LobbyQuickActions({
   onShowSocieties: () => void;
   onShowLeaderboard: () => void;
   onShowDailyQuiz: () => void;
+  onShowReferral: () => void;
   friendsBadgeCount?: number;
 }) {
   return (
@@ -125,6 +127,17 @@ export default function LobbyQuickActions({
           sub="Rankings"
           onPress={onShowLeaderboard}
         />
+      </div>
+
+      <div className="flex gap-[10px] mt-[10px]">
+        <GridTile
+          icon={Gift}
+          color="#D4AF37"
+          label="Invite & Earn"
+          sub="3 Tokens FREE"
+          onPress={onShowReferral}
+        />
+        <div className="flex-1" /> {/* Spacer */}
       </div>
     </div>
   );
