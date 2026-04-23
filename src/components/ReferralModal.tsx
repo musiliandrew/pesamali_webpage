@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { X, Copy, Check, Users, Gift, Share2, Award } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
 import { getApiBaseUrl } from "@/lib/env";
 
 interface ReferralStats {
@@ -13,17 +12,25 @@ interface ReferralStats {
     societyRank?: number;
 }
 
-export default function ReferralModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-    const { user } = useAuth();
+export default function ReferralModal({
+    isOpen,
+    onClose,
+    userDisplayName,
+    referralCode
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    userDisplayName: string;
+    referralCode: string;
+}) {
     const [copied, setCopied] = useState(false);
     const [stats, setStats] = useState<ReferralStats | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (isOpen && user) {
-            // Mocking stats for now or fetch from /api/social/referrals if implemented
+        if (isOpen) {
             setStats({
-                code: user.referralCode || "GETTING_CODE...",
+                code: referralCode || "GETTING_CODE...",
                 totalReferred: 0,
                 tokensEarned: 0,
                 pendingVerifications: 0,
@@ -31,7 +38,7 @@ export default function ReferralModal({ isOpen, onClose }: { isOpen: boolean; on
             });
             setLoading(false);
         }
-    }, [isOpen, user]);
+    }, [isOpen, referralCode]);
 
     const handleCopy = () => {
         if (stats?.code) {

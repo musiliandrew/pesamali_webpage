@@ -52,7 +52,8 @@ export default function PlayLobbyPage() {
     streak: number;
     friendsCount: number;
     tier?: string;
-  }>({ pesaPoints: 0, pesaTokens: 0, streak: 0, friendsCount: 0 });
+    referralCode: string;
+  }>({ pesaPoints: 0, pesaTokens: 0, streak: 0, friendsCount: 0, referralCode: "" });
   const [showMatchSetup, setShowMatchSetup] = useState(false);
   const [showFriends, setShowFriends] = useState(false);
   const [showSocieties, setShowSocieties] = useState(false);
@@ -109,6 +110,7 @@ export default function PlayLobbyPage() {
           streak: typeof parsed?.streak === "number" ? parsed.streak : 0,
           friendsCount: typeof parsed?.friendsCount === "number" ? parsed.friendsCount : 0,
           tier: parsed?.tier,
+          referralCode: (parsed as any)?.referralCode || "",
         });
       }
 
@@ -125,6 +127,7 @@ export default function PlayLobbyPage() {
           pesaTokens: user.pesaTokens ?? 0,
           streak: user.streak ?? 0,
           tier: user.tier || "Bronze",
+          referralCode: user.referralCode || "",
         }));
         localStorage.setItem("pm_user", JSON.stringify({
           id: user.id,
@@ -132,7 +135,8 @@ export default function PlayLobbyPage() {
           pesaPoints: user.pesaPoints,
           pesaTokens: user.pesaTokens,
           streak: user.streak,
-          tier: user.tier
+          tier: user.tier,
+          referralCode: user.referralCode
         }));
       }
     } catch {
@@ -566,6 +570,8 @@ export default function PlayLobbyPage() {
         <ReferralModal
           isOpen={showReferral}
           onClose={() => setShowReferral(false)}
+          userDisplayName={meName}
+          referralCode={meStats.referralCode}
         />
       </div>
     </main>
