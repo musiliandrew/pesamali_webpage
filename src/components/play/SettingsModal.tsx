@@ -1,11 +1,29 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { User, Bell, Shield, Info, LogOut, Save, Camera, Smartphone, Globe, Briefcase } from "lucide-react";
+import { useState, useEffect } from "react";
+import { User, Bell, Shield, Info, LogOut, Save, Camera, Globe, Briefcase, type LucideIcon } from "lucide-react";
 import OverlayModal from "./OverlayModal";
-import { getApiBaseUrl } from "@/lib/env";
-import { getToken, clearAuth } from "@/lib/auth";
+import { clearAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+import { listProfessionSubs, listProfessions, type Profession, type ProfessionSub } from "@/lib/content";
+import { patch, post } from "@/lib/api";
+
+type SettingsUserData = {
+    displayName?: string;
+    email?: string;
+    professionId?: string;
+    professionSub?: string | null;
+    notificationsEnabled?: boolean;
+    streakRemindersEnabled?: boolean;
+    countryName?: string;
+};
+
+type ToggleProps = {
+    checked: boolean;
+    onChange: (next: boolean) => void;
+    label: string;
+    sublabel: string;
+};
 
 export default function SettingsModal({
     open,
@@ -15,7 +33,7 @@ export default function SettingsModal({
 }: {
     open: boolean;
     onClose: () => void;
-    userData: any;
+    userData: SettingsUserData | null;
     onRefresh?: () => void;
 }) {
     const router = useRouter();
@@ -25,42 +43,85 @@ export default function SettingsModal({
     // Form States
     const [displayName, setDisplayName] = useState(userData?.displayName || "");
     const [professionId, setProfessionId] = useState(userData?.professionId || "");
+    const [professionSub, setProfessionSub] = useState<string>(userData?.professionSub || "");
     const [notifEnabled, setNotifEnabled] = useState(!!userData?.notificationsEnabled);
     const [streakReminders, setStreakReminders] = useState(!!userData?.streakRemindersEnabled);
 
-    const apiBase = useMemo(() => getApiBaseUrl(), []);
+    const [professions, setProfessions] = useState<Profession[]>([]);
+    const [professionSubs, setProfessionSubs] = useState<ProfessionSub[]>([]);
+    const [loadingProfessions, setLoadingProfessions] = useState(false);
+    const [loadingSubs, setLoadingSubs] = useState(false);
 
     useEffect(() => {
         if (userData) {
             setDisplayName(userData.displayName || "");
             setProfessionId(userData.professionId || "");
+            setProfessionSub(userData.professionSub || "");
             setNotifEnabled(!!userData.notificationsEnabled);
             setStreakReminders(!!userData.streakRemindersEnabled);
         }
     }, [userData]);
 
+    useEffect(() => {
+        if (!open) return;
+        let cancelled = false;
+
+        const run = async () => {
+            setLoadingProfessions(true);
+            try {
+                const data = await listProfessions();
+                if (!cancelled) setProfessions(Array.isArray(data) ? data : []);
+            } catch {
+                if (!cancelled) setProfessions([]);
+            } finally {
+                if (!cancelled) setLoadingProfessions(false);
+            }
+        };
+
+        run();
+        return () => {
+            cancelled = true;
+        };
+    }, [open]);
+
+    useEffect(() => {
+        if (!open) return;
+        if (!professionId) {
+            setProfessionSubs([]);
+            return;
+        }
+
+        let cancelled = false;
+        const run = async () => {
+            setLoadingSubs(true);
+            try {
+                const data = await listProfessionSubs(professionId);
+                if (!cancelled) setProfessionSubs(Array.isArray(data) ? data : []);
+            } catch {
+                if (!cancelled) setProfessionSubs([]);
+            } finally {
+                if (!cancelled) setLoadingSubs(false);
+            }
+        };
+
+        run();
+        return () => {
+            cancelled = true;
+        };
+    }, [open, professionId]);
+
     const handleSave = async () => {
         setSaving(true);
         try {
-            const res = await fetch(`${apiBase}/api/auth/me`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${getToken()}`,
-                },
-                body: JSON.stringify({
+            await patch("/api/auth/me", {
                     display_name: displayName,
                     profession_id: professionId,
+                    profession_sub: professionSub || null,
                     notifications_enabled: notifEnabled ? 1 : 0,
                     streak_reminders_enabled: streakReminders ? 1 : 0,
-                }),
             });
-            if (res.ok) {
-                onRefresh?.();
-                alert("Settings updated successfully!");
-            } else {
-                alert("Failed to update settings");
-            }
+            onRefresh?.();
+            alert("Settings updated successfully!");
         } catch {
             alert("Network error. Try again.");
         } finally {
@@ -70,12 +131,20 @@ export default function SettingsModal({
 
     const handleLogout = () => {
         if (confirm("Are you sure you want to logout?")) {
-            clearAuth();
-            router.push("/play/login");
+            (async () => {
+                try {
+                    await post<unknown>("/api/auth/logout", {});
+                } catch {
+                    // ignore
+                } finally {
+                    clearAuth();
+                    router.push("/play/login");
+                }
+            })();
         }
     };
 
-    const Toggle = ({ checked, onChange, label, sublabel }: any) => (
+    const Toggle = ({ checked, onChange, label, sublabel }: ToggleProps) => (
         <div className="flex items-center justify-between py-4 border-b border-black/[0.03]">
             <div className="flex-1">
                 <div className="text-[11px] font-black uppercase text-brand-dark tracking-tight">{label}</div>
@@ -95,14 +164,14 @@ export default function SettingsModal({
             <div className="flex flex-col h-[70vh]">
                 {/* Tabs */}
                 <div className="flex gap-2 mb-6 px-1">
-                    {[
+                    {([
                         { id: 'profile', icon: User, label: 'Profile' },
                         { id: 'notifications', icon: Bell, label: 'Alerts' },
                         { id: 'about', icon: Info, label: 'About' },
-                    ].map((tab) => (
+                    ] as Array<{ id: 'profile' | 'notifications' | 'about'; icon: LucideIcon; label: string }>).map((tab) => (
                         <button
                             key={tab.id}
-                            onClick={() => setActiveTab(tab.id as any)}
+                            onClick={() => setActiveTab(tab.id)}
                             className={`flex-1 flex flex-col items-center gap-2 py-3 rounded-2xl border-2 transition-all ${activeTab === tab.id ? 'bg-brand-gold/10 border-brand-gold text-brand-gold' : 'bg-white border-black/[0.03] text-brand-dark/40 hover:border-brand-gold/20'}`}
                         >
                             <tab.icon size={18} />
@@ -149,13 +218,38 @@ export default function SettingsModal({
                                         <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-gold" size={16} />
                                         <select
                                             value={professionId}
-                                            onChange={(e) => setProfessionId(e.target.value)}
+                                            onChange={(e) => {
+                                                setProfessionId(e.target.value);
+                                                setProfessionSub("");
+                                            }}
                                             className="w-full pl-12 pr-4 py-4 rounded-2xl bg-black/5 border-none text-[11px] font-black uppercase tracking-wider outline-none appearance-none cursor-pointer"
                                         >
-                                            <option value="student">Student</option>
-                                            <option value="employee">Employee</option>
-                                            <option value="entrepreneur">Entrepreneur</option>
-                                            <option value="freelancer">Freelancer</option>
+                                            <option value="">{loadingProfessions ? "Loading..." : "Select profession"}</option>
+                                            {professions.map((p) => (
+                                                <option key={p.id} value={p.id}>
+                                                    {p.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-brand-dark/40 ml-1 mb-2 block">Specialization</label>
+                                    <div className="relative">
+                                        <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-gold" size={16} />
+                                        <select
+                                            value={professionSub}
+                                            onChange={(e) => setProfessionSub(e.target.value)}
+                                            disabled={!professionId || loadingSubs}
+                                            className="w-full pl-12 pr-4 py-4 rounded-2xl bg-black/5 border-none text-[11px] font-black uppercase tracking-wider outline-none appearance-none cursor-pointer disabled:opacity-50"
+                                        >
+                                            <option value="">{!professionId ? "Select profession first" : loadingSubs ? "Loading..." : "Optional"}</option>
+                                            {professionSubs.map((s) => (
+                                                <option key={s.id} value={s.name}>
+                                                    {s.name}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>

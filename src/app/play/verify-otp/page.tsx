@@ -1,13 +1,20 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
-import { ShieldCheck, Mail, ArrowRight, RefreshCw, Smartphone } from "lucide-react";
+import { ArrowRight, RefreshCw, ShieldCheck } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/env";
 import { setToken } from "@/lib/auth";
 
 export default function VerifyOtpPage() {
+    return (
+        <Suspense fallback={<div />}> 
+            <VerifyOtpInner />
+        </Suspense>
+    );
+}
+
+function VerifyOtpInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const email = searchParams.get("email") || "";
