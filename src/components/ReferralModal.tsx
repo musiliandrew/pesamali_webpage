@@ -41,10 +41,36 @@ export default function ReferralModal({
     }, [isOpen, referralCode]);
 
     const handleCopy = () => {
-        if (stats?.code) {
+        if (stats?.code && stats.code !== "GETTING_CODE...") {
             navigator.clipboard.writeText(stats.code);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    const handleShare = async () => {
+        if (!stats?.code || stats.code === "GETTING_CODE...") return;
+
+        const referralLink = `https://pesamali.moski.money/play/register?ref=${stats.code}`;
+        const shareText = `Join me on PesaMali! Use my code ${stats.code} to get 1 FREE Token instantly! 🎮💎`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'PesaMali Invite',
+                    text: shareText,
+                    url: referralLink,
+                });
+            } catch (err) {
+                // If user cancels or fails, fallback to copy
+                if (err instanceof Error && err.name !== 'AbortError') {
+                    navigator.clipboard.writeText(`${shareText}\n${referralLink}`);
+                    alert("Invite link copied to clipboard!");
+                }
+            }
+        } else {
+            navigator.clipboard.writeText(`${shareText}\n${referralLink}`);
+            alert("Invite link copied to clipboard!");
         }
     };
 
@@ -144,7 +170,7 @@ export default function ReferralModal({
                             </div>
                         </div>
 
-                        <button className="w-full py-5 bg-brand-gold rounded-3xl flex items-center justify-center gap-3 shadow-lg hover:shadow-brand-gold/20 transition active:scale-[0.98]">
+                        <button onClick={handleShare} className="w-full py-5 bg-brand-gold rounded-3xl flex items-center justify-center gap-3 shadow-lg hover:shadow-brand-gold/20 transition active:scale-[0.98]">
                             <Share2 size={20} className="text-white" />
                             <span className="text-lg font-black text-white uppercase tracking-wider">Share My Link</span>
                         </button>
