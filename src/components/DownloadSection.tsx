@@ -76,7 +76,7 @@ export default function DownloadSection() {
             your Android device.
           </p>
           <a
-            href="https://expo.dev/artifacts/eas/agszo1Jb4Rg37frhHkZtmr.apk"
+            href="https://expo.dev/artifacts/eas/9DV3S7AkNr5anAdsiwL53b.apk"
             className="inline-flex items-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-dark font-bold px-6 py-3 rounded-full transition-all hover:scale-105 shadow-lg shadow-brand-gold/20"
             download
           >
